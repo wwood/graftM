@@ -75,11 +75,7 @@ class Classify:
                 return tax_that_meets_threshold
             else:
                 raise Exception("Programming error.")
-                
-        
-        def forcePlacement(placement_list, rank): 
-            ranks=['kingdom', 'class', 'phylum', 'order', 'family', 'species']
-            rank_idx=ranks.index(rank)
+
             
         def consolidatePlacements(placement_list, cutoff, lwr_idx, c_idx, resolve_placements, place_group):
             seen={}
@@ -113,7 +109,8 @@ class Classify:
             raise Exception('Fatal error in refpkg, classification or like_weight_ratio fields missing')
 
         for placement_group in placement_hash['placements']: # for each placement
-            best_place=consolidatePlacements(placement_group['p'], cutoff, lwr_idx, c_idx, resolve_placements, placement_group['nm']) # Find the best placement       
+            best_place=consolidatePlacements(placement_group['p'], cutoff, lwr_idx, c_idx, resolve_placements, placement_group['nm']) # Find the best placement
+            import IPython; IPython.embed()       
             if best_place: # if it exists
                 reads=[x[0] for x in placement_group['nm']] # make a list of the reads assigned to that placement
                 for read in reads: # and for each read
