@@ -30,8 +30,9 @@ class TaxonomyExtractor:
         return tip_to_taxonomy
     
     def taxonomy_from_node_name(self, node_name):
-        '''return the taxonomy incorporated at a particular node, or None
-        if it does not encode any taxonomy
+        '''return the taxonomy incorporated at a particular node, or None if it does not
+        encode any taxonomy. Always convert spaces to underscores to avoid
+        trouble later in the grafm pipeline.
         
         Parameters
         ----------
@@ -41,6 +42,7 @@ class TaxonomyExtractor:
         Returns
         -------
         Taxonomy as a string, or None if there is no taxonomy
+
         '''
         
         def is_float(s):
@@ -49,6 +51,9 @@ class TaxonomyExtractor:
                 return True
             except ValueError:
                 return False
+
+        def replace_spaces(s):
+            return s.replace(' ','_')
         
         if node_name is None:
             return None
@@ -60,7 +65,7 @@ class TaxonomyExtractor:
             reg = bootstrap_regex.match(node_name)
             if reg:
                 # bootstrap in name
-                return reg.groups(0)[0]
+                return replace_spaces(reg.groups(0)[0])
             else:
                 # bootstrap not in name
-                return node_name
+                return replace_spaces(node_name)

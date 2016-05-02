@@ -57,7 +57,15 @@ class Tests(unittest.TestCase):
                            u'd': ['tax']},
                           TaxonomyExtractor().taxonomy_from_annotated_tree(\
                             TreeNode.read(StringIO(u"(a,(b,(c,d:0.2)'0.2:tax')0.01973:0.9)root;"))))
-        
+
+    def test_spaces_in_annotated_tree(self):
+        self.assertEquals({u'a': [],
+                           u'b': [],
+                           u'c': [u'tax_1'],
+                           u'd': [u'tax_1']},
+                          TaxonomyExtractor().taxonomy_from_annotated_tree(\
+                            TreeNode.read(StringIO(u"(a,(b,(c,d:0.2)'tax 1':0.54)0.01973:0.9)root;"))))
+
 
         
 
