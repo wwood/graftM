@@ -673,7 +673,11 @@ in the final GraftM package. If you are sure these sequences are correct, turn o
                 logging.info("Checking for incorrect or fragmented reads")
                 insufficiently_aligned_sequences = self._check_reads_hit(open(output_alignment),
                                                                          min_aligned_percent)
-        if not search_hmm_files:
+
+        # Use the alignment HMM when there is no dereplication
+        if not search_hmm_files and alignment and dereplication_level == 0:
+            search_hmm_files = None
+        elif not search_hmm_files:
             search_hmm_fh = tempfile.NamedTemporaryFile(prefix='graftm', suffix='_search.hmm')
             tempfiles_to_close.append(search_hmm_fh)
             search_hmm = search_hmm_fh.name
