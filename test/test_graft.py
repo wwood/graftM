@@ -624,6 +624,50 @@ AAAAAFFFAFFFFFF<FFFFFFAAFFFFFF)FFFFAFFFFFFFFFFFFFFFFFFFFFFFF7FF7FFFFFFFF<FFFFFFF
                                                                                                                tmp)
                 subprocess.check_output(cmd, shell=True)
 
+    def test_interleaved_nearly_equivalent_to_foward_reverse(self):
+        files_to_compare = [
+            'search_otu_table.txt',
+            'combined_count_table.txt',
+            os.path.join('mcrA_1.1','mcrA_1.1_read_tax.tsv'), #TODO: Arguably, having the read_tax show /1 and /2 as interleaved does is preferable.
+            os.path.join('mcrA_1.1','mcrA_1.1_hits.aln.fa')
+        ]
+        with tempdir.TempDir() as tmp_standard:
+            # Run separately forward/reverse as gold standard
+            cmd = '{} graft --verbosity 5  --forward {} --reverse {} --graftm_package {} --output_directory {} --force'.format(
+                path_to_script,
+                os.path.join(path_to_data,'mcrA.gpkg', 'mcrA_1.1.fna'),
+                os.path.join(path_to_data,'mcrA.gpkg', 'mcrA_1.2.fna'),
+                os.path.join(path_to_data,'mcrA.gpkg'),
+                tmp_standard)
+            extern.run(cmd)
+
+            interleaved_files = [
+                'mcrA_1.1.fna',
+                'mcrA_1.1.fna.gz',
+                'mcrA_1.1.fq',
+                'mcrA_1.1.fq.gz'
+            ]
+
+            for interleaved_file in interleaved_files:
+                with tempdir.TempDir() as tmp_interleaved:
+                    cmd = '{} graft --verbosity 5  --interleaved {} --graftm_package {} --output_directory {} --force'.format(
+                        path_to_script,
+                        os.path.join(path_to_data,'interleaved_mcrA',interleaved_file),
+                        os.path.join(path_to_data,'mcrA.gpkg'),
+                        tmp_interleaved)
+                    extern.run(cmd)
+
+                    for fi in files_to_compare:
+                        try:
+                            self.assertEqual(
+                                open(os.path.join(tmp_standard, fi)).read(),
+                                open(os.path.join(tmp_interleaved, fi)).read().replace('/1',''),
+                                "failed interleaved file {}, specifically output file {}".format(
+                                    interleaved_file, fi)
+                            )
+                        except IOError as e:
+                            raise Exception("IOError occurred testing comparison for {}".format(interleaved_file) + str(e))
+
 
     def test_multiple_paired_read_run_McrA(self):
         data_for1 = os.path.join(path_to_data,'mcrA.gpkg', 'mcrA_1.1.fna')
